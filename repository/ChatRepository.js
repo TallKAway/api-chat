@@ -34,7 +34,19 @@ async function createMessage(senderId, conversationId, content) {
   });
 }
 
+async function getConversation(userId, receiverId) {
+  return await prisma.directConversation.findFirst({
+    where: {
+      OR: [
+        { user1Id: userId, user2Id: receiverId },
+        { user1Id: receiverId, user2Id: userId },
+      ],
+    },
+  });
+}
+
 module.exports = {
   findOrCreateDirectConversation,
   createMessage,
+  getConversation
 };
