@@ -1,8 +1,5 @@
-const { model } = require('mongoose');
-const userRouter = require('./routes/user.route');
+const userRouter = require("./routes/chat.route");
 
-
-
-model.exports = (app)=>{
-    app.use('/chat', userRouter);
-}
+module.exports = (app) => {
+  app.use("/chat", userRouter);
+};
