@@ -45,8 +45,17 @@ async function getConversation(userId, receiverId) {
   });
 }
 
+async function getConversationById(id) {
+  return await prisma.directMessage.findMany({
+    where: {
+      direcConversationId: id,
+    },
+  });
+}
+
 module.exports = {
   findOrCreateDirectConversation,
   createMessage,
-  getConversation
+  getConversation,
+  getConversationById
 };
