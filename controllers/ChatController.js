@@ -3,23 +3,23 @@ const {
   createMessage,
   findOrCreateDirectConversation,
   getConversation,
-  getConversationById
+  getConversationById,
 } = require("../repository/ChatRepository");
 const ResponseMessage = require("../constants/ResponseMessage");
 const { get } = require("mongoose");
 
 async function CreateChat(req, res) {
   try {
-    const { senderId, receiverId, content } = req.body;
+    const userId = req.payload.userId;
 
-    // Trouver ou créer la conversation
+    const { receiverId, content } = req.body;
+
     const conversation = await findOrCreateDirectConversation(
-      senderId,
+      userId,
       receiverId
     );
 
-    // Insérer le message
-    const message = await createMessage(senderId, conversation.id, content);
+    const message = await createMessage(userId, conversation.id, content);
 
     return res.status(201).json({
       status: ResponseMessage.MSG_300,
@@ -39,7 +39,9 @@ async function CreateChat(req, res) {
 
 async function GetConversation(req, res) {
   try {
-    const { userId, receiverId } = req.body;
+    const userId = req.payload.userId;
+
+    const { receiverId } = req.body;
 
     const conversation = await getConversation(userId, receiverId);
 
@@ -50,9 +52,7 @@ async function GetConversation(req, res) {
     });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ error: "Error retrieving conversation" });
+    return res.status(500).json({ error: "Error retrieving conversation" });
   }
 }
 
@@ -69,14 +69,12 @@ async function GetConversationById(req, res) {
     });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ error: "Error retrieving conversation" });
+    return res.status(500).json({ error: "Error retrieving conversation" });
   }
 }
 
 module.exports = {
   CreateChat,
   GetConversation,
-  GetConversationById
+  GetConversationById,
 };
