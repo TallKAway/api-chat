@@ -3,12 +3,7 @@ const ChatController = require("../controllers/ChatController");
 const route = Router();
 const { isAuthenticated } = require("../middlewares/auth");
 
-route.post("/add", isAuthenticated, ChatController.CreateChat);
-route.get("/conversation", isAuthenticated, ChatController.GetConversation);
-route.get(
-  "/conversation/:id",
-  isAuthenticated,
-  ChatController.GetConversationById
-);
-
+// route.post("/add", isAuthenticated, ChatController.CreateChat);
+route.get("/conversation/:friendId/messages", isAuthenticated, ChatController.GetConversationMessages);
+route.get("/conversation/:friendId", isAuthenticated, ChatController.GetConversation);
 module.exports = route;

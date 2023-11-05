@@ -22,7 +22,7 @@ function isAuthenticated(req, res, next) {
   const { authorization } = req.headers;
 
   var fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
-  console.log(`Request from : ${fullUrl}`);
+  // console.log(`Request from : ${fullUrl}`);
 
   if (!authorization) {
     console.log(`No valid authorization header : ${authorization}`);
@@ -65,9 +65,23 @@ function isValidatedPasswordToken(token) {
   }
 }
 
+function decodeToken(token) {
+  try {
+    const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    return payload;
+  } catch (err) {
+    console.log(err.name);
+    if (err.name === "TokenExpiredError") {
+      return { error: "Le token est expiré." };
+    }
+    return { error: "Token invalide." };
+  }
+}
+
 module.exports = {
   notFound,
   errorHandler,
   isAuthenticated,
   isValidatedPasswordToken,
+  decodeToken
 };

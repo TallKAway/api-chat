@@ -3,21 +3,26 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const createSocket = require("./socket/socketio");
 const route = require("./routes");
 const http = require("http");
+const socket = require('./socket/socketio.js');
 const { rabbitMQProducer } = require("./amqp/producer");
 
-const PORT = process.env.PORT || 3007;
-const api = express();
 dotenv.config();
+
+const PORT = process.env.PORT || 3007;
+
+const api = express();
+const server = http.createServer(api);
+socket(server);
+
+
 api.use(express.json());
 api.use(express.urlencoded({ extended: true }));
+api.use(express.static("public"));
 api.use(cors({
   origin: '*'
 }));
-
-api.use(express.static("public"));
 
 const ads = [{ Message: `Chat api is running on Port: ${PORT}` }];
 
@@ -30,9 +35,9 @@ api.get("/socket", (req, res) => {
 
 route(api);
 
-const server = http.createServer(api);
-let io = createSocket(server);
-global.io = io;
+
+
+
 
 server
   .listen(PORT, async () => {

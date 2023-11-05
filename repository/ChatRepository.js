@@ -24,7 +24,7 @@ async function findOrCreateDirectConversation(userId1, userId2) {
   return conversation;
 }
 
-async function createMessage(senderId, conversationId, content) {
+async function addMessageToConversation(senderId, conversationId, content) {
   return await prisma.directMessage.create({
     data: {
       content: content,
@@ -45,7 +45,7 @@ async function getConversation(userId, receiverId) {
   });
 }
 
-async function getConversationById(id) {
+async function getConversationMessagesById(id) {
   return await prisma.directMessage.findMany({
     where: {
       direcConversationId: id,
@@ -55,7 +55,7 @@ async function getConversationById(id) {
 
 module.exports = {
   findOrCreateDirectConversation,
-  createMessage,
+  addMessageToConversation,
   getConversation,
-  getConversationById
+  getConversationMessagesById
 };

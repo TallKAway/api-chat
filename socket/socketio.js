@@ -1,28 +1,35 @@
-const socketio = require('socket.io');
+const { Server } = require('socket.io');
+const { findOrCreateDirectConversation, addMessageToConversation } = require('../repository/ChatRepository');
+const { decodeToken } = require('../middlewares/auth');
 
-const SocketEvents = require('../constants/SocketEvents');
-
-
-module.exports = (http) => {
-  // const io = ""
-  const io = socketio(http, {
-    cors: { origin: '*' },
-  });
-let chatApiRoom = "chatApiRoom"
-
-  io.on(SocketEvents.CONNECT, socket => {
-    // logger.info(`⚡: ${socket.id} user just connected`);
-
-    socket.join(chatApiRoom);
-    //Send this event to everyone in the room.
-    io.sockets.in(chatApiRoom)
-        .emit(SocketEvents.CHAT_CREATED, "User est creer ChatApiRoom");
-
-    socket.on(SocketEvents.DISCONNECT, () => {
-    //   logger.info('Facilitator DISCONNECT');
+module.exports = (server) => {
+    const io = new Server(server, {
+        cors: {
+            origin: "*",
+            methods: ['GET', 'POST']
+        }
     });
 
-  })
 
-  return io;
+    io.on('connection', (socket) => {
+        console.log(`User connected: ${socket.id}`);
+
+        socket.on('join_conversation', async ({ token, receiverId, conversationId }) => {
+            const { userId } = decodeToken(token);
+            socket.join(conversationId);
+            console.log(`User ${userId} joined room: ${conversationId}`);
+          });
+        
+        socket.on('send_message', async ({ token, receiverId, content }) => {
+            const { userId } = decodeToken(token);
+            const conversation = await findOrCreateDirectConversation(userId, receiverId);
+            await addMessageToConversation(userId, conversation.id, content);
+            io.to(conversation.id).emit('message', {content, senderId: userId, conversationId: conversation.id}); 
+        });
+
+        socket.on('leave_conversation', ({ conversationId }) => {
+            socket.leave(conversationId);
+            console.log(`User ${socket.id} left room ${conversationId}`);
+          });
+    });
 };
