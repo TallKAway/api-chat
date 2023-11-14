@@ -3,7 +3,8 @@ const {
   createMessage,
   findOrCreateDirectConversation,
   getConversation,
-  getConversationMessagesById
+  getConversationMessagesById,
+  getConversationsByUserId
 } = require("../repository/ChatRepository");
 const ResponseMessage = require("../constants/ResponseMessage");
 
@@ -54,8 +55,8 @@ async function GetConversation(req, res) {
 
 async function GetConversationMessages(req, res) {
   try {
-    const userId = req.payload.userId;
-    const { id } = await getConversation(userId, req.params.friendId);
+    const id = req.params.conversationId;
+    
     const messages = await getConversationMessagesById(id);
 
     return res.status(200).json({
@@ -70,8 +71,35 @@ async function GetConversationMessages(req, res) {
   }
 }
 
+async function GetConversationsByUserId(req, res) {
+  try {
+    const userId = req.payload.userId;
+    
+    const conversations = await getConversationsByUserId(userId);
+
+    const filteredConversations = conversations.map((conversation) => {
+      const friendId = conversation.user1Id === userId ? conversation.user2Id : conversation.user1Id;
+      return {
+        id: conversation.id,
+        friendId: friendId,
+        createdAt: conversation.createdAt
+      };
+    });
+
+    return res.status(200).json({
+      status: ResponseMessage.NO_MSG,
+      message: "conversations retrieved successfully",
+      data: filteredConversations,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error retrieving conversations" });
+  }
+}
+
 module.exports = {
   CreateChat,
   GetConversation,
-  GetConversationMessages
+  GetConversationMessages,
+  GetConversationsByUserId
 };

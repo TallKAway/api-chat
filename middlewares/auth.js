@@ -21,32 +21,32 @@ function errorHandler(err, req, res, next) {
 function isAuthenticated(req, res, next) {
   const { authorization } = req.headers;
 
-  var fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
-  // console.log(`Request from : ${fullUrl}`);
-
   if (!authorization) {
-    console.log(`No valid authorization header : ${authorization}`);
-    res.status(401).json({ error: "🚫 Un-Authorized 🚫" });
-
-    // throw new Error('🚫 Un-Authorized 🚫');
+      res.status(401);
+      return res.status(400).json({ msg: "🚫 Un-Authorized 🚫" });
   }
 
   try {
-    if (authorization) {
-      const token = authorization.split(" ")[1];
+      const token = authorization.split(' ')[1];
       const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-      payload.usrData = decrypt(payload.usrData);
-      req.payload = payload;
-    }
-    // return res.status(401).json({ error : '🚫 Un-Authorized 🚫', errorStack: ""});
-  } catch (err) {
-    if (err.name === "TokenExpiredError")
-      return res.status(401).json({ error: err.name });
 
-    console.log(err);
-    return res
-      .status(401)
-      .json({ error: "🚫 Un-Authorized 🚫", errorStack: err });
+      if (!payload.isAdmin){
+          const usrData = decrypt(payload.usrData)
+          const userData = usrData.split("__");
+          const userObject = {
+              name: userData[0] +' '+ userData[1],
+              avatar: userData[2],
+              id: userData[3],
+          };
+          payload.usrData = userObject
+      }
+      req.payload = payload;
+  } catch (err) {
+      res.status(401);
+      if (err.name === 'TokenExpiredError') {
+          return res.status(400).json({ msg: "🚫 Token has Expired 🚫" });
+      }
+      return res.status(400).json({ msg: "🚫 Un-Authorizedsss 🚫" });
   }
 
   return next();
