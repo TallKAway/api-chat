@@ -7,7 +7,6 @@ const route = require("./routes");
 const http = require("http");
 const socket = require('./socket/socketio.js');
 const { rabbitMQProducer } = require("./amqp/producer");
-const path = require("path");
 
 dotenv.config();
 
@@ -36,7 +35,7 @@ api.get("/socket", (req, res) => {
 route(api);
 
 server
-  .listen(PORT, "0.0.0.0", async () => {
+  .listen(PORT, async () => {
     console.info(`Listening on port ${PORT}`);
     try {
       await rabbitMQProducer.connect();
@@ -49,4 +48,4 @@ server
 
 module.exports = api;
 
-// 192.168.137.1
+
