@@ -17,7 +17,6 @@ const api = express();
 const server = http.createServer(api);
 socket(server);
 
-
 api.use(express.json());
 api.use(express.urlencoded({ extended: true }));
 api.use(express.static("public"));
@@ -36,12 +35,8 @@ api.get("/socket", (req, res) => {
 
 route(api);
 
-
-
-
-
 server
-  .listen(PORT, async () => {
+  .listen(PORT, "0.0.0.0", async () => {
     console.info(`Listening on port ${PORT}`);
     try {
       await rabbitMQProducer.connect();
@@ -53,3 +48,5 @@ server
   .setTimeout(50000);
 
 module.exports = api;
+
+// 192.168.137.1
