@@ -38,8 +38,11 @@ async function CreateChat(req, res) {
 }
 
 async function GetConversation(req, res) {
+
   try {
-    const userId = req.payload.userId;
+    
+    const { userId } = req.payload;
+    
     const conversation = await findOrCreateDirectConversation(userId, req.params.friendId);
 
     return res.status(200).json({

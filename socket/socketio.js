@@ -8,6 +8,7 @@ module.exports = (server) => {
             origin: "*",
             methods: ['GET', 'POST']
         }
+        
     });
 
 

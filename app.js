@@ -7,6 +7,7 @@ const route = require("./routes");
 const http = require("http");
 const socket = require('./socket/socketio.js');
 const { rabbitMQProducer } = require("./amqp/producer");
+const path = require("path");
 
 dotenv.config();
 
