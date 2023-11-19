@@ -4,11 +4,11 @@ const { decodeToken } = require('../middlewares/auth');
 
 module.exports = (server) => {
     const io = new Server(server, {
+        path: '/socket.io',
         cors: {
             origin: "*",
             methods: ['GET', 'POST']
         }
-        
     });
 
 
