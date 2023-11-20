@@ -58,9 +58,16 @@ async function GetConversation(req, res) {
 
 async function GetConversationMessages(req, res) {
   try {
+    const { userId } = req.payload;
+
     const id = req.params.conversationId;
     
     const messages = await getConversationMessagesById(id);
+
+    // true if message is sent by the user
+    messages.forEach((message) => {
+      message.senderId === userId ? message.isMine = true : message.isMine = false;
+    });
 
     return res.status(200).json({
       status: ResponseMessage.NO_MSG,

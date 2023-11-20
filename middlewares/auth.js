@@ -48,7 +48,21 @@ function isValidatedPasswordToken(token) {
     }
 }
 
+function decodeToken(token) {
+    try {
+        const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+        return payload
+    } catch (err) {
+        console.log(err.name)
+        if (err.name === 'TokenExpiredError') {
+            return ({ error : 'Le token est expiré.'});
+        }
+        return ({ error : 'Token invalide.'});
+    }
+}
+
 module.exports = {
     isAuthenticated,
-    isValidatedPasswordToken
+    isValidatedPasswordToken,
+    decodeToken
 };
