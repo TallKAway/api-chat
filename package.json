@@ -23,6 +23,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.6.3",
     "socket.io": "^4.7.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "uuid": "^9.0.1",
     "websocket": "^1.0.34"
   },

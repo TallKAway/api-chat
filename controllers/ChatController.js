@@ -8,6 +8,66 @@ const {
 } = require("../repository/ChatRepository");
 const ResponseMessage = require("../constants/ResponseMessage");
 
+
+/**
+ * @swagger
+ * tags:
+ *   name: Chat
+ *   description: Endpoints for chat
+ */
+
+
+/**
+ * @swagger
+ * /conversation/{friendId}:
+ *   get:
+ *     tags: [Chat]
+ *     description: Get conversation by friend ID
+ *     parameters:
+ *       - in: header 
+  *         name: Authorization
+  *         schema:
+  *          type: string
+  *          format: jwt
+  *         description: JWT token
+  *         required: true
+ *       - in: payload
+ *         name: id
+ *         required: true
+ *         description: User ID
+ *         schema:
+ *           type: string
+  *       - in: path
+  *         name: friendId  
+  *         schema: 
+  *          type: string
+  * 
+ *     responses:
+ *       '201':
+ *         description: Get conversation by friend ID
+ *       '400':
+ *         description: Bad request 
+ */
+async function GetConversation(req, res) {
+
+  try {
+    
+    const { userId } = req.payload;
+    
+    const conversation = await findOrCreateDirectConversation(userId, req.params.friendId);
+
+    return res.status(200).json({
+      status: ResponseMessage.NO_MSG,
+      message: "conversation retrieved successfully",
+      data: conversation,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error retrieving conversation" });
+  }
+}
+
+
 async function CreateChat(req, res) {
   try {
     const userId = req.payload.userId;
@@ -37,25 +97,38 @@ async function CreateChat(req, res) {
   }
 }
 
-async function GetConversation(req, res) {
 
-  try {
-    
-    const { userId } = req.payload;
-    
-    const conversation = await findOrCreateDirectConversation(userId, req.params.friendId);
-
-    return res.status(200).json({
-      status: ResponseMessage.NO_MSG,
-      message: "conversation retrieved successfully",
-      data: conversation,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Error retrieving conversation" });
-  }
-}
-
+/**
+ * @swagger
+ * /conversation/{conversationId}/messages:
+ *   get:
+ *     tags: [Conversation]
+ *     description: Get messages by conversation ID
+ *     parameters:
+ *       - in: header 
+  *         name: Authorization
+  *         schema:
+  *          type: string
+  *          format: jwt
+  *         description: JWT token
+  *         required: true
+ *       - in: payload
+ *         name: id
+ *         required: true
+ *         description: User ID
+ *         schema:
+ *           type: string
+  *       - in: path
+  *         name: conversationId  
+  *         schema: 
+  *          type: string
+  *      
+ *     responses:
+ *       '201':
+ *         description: Get messages by conversation ID
+ *       '400':
+ *         description: Bad request
+ */
 async function GetConversationMessages(req, res) {
   try {
     const { userId } = req.payload;
