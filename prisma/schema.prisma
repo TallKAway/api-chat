@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model DirectMessage {
+  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
+  content             String
+  createdAt           DateTime           @default(now())
+  senderId            String             @db.ObjectId
+  direcConversationId String             @db.ObjectId
+  direcConversation   DirectConversation @relation(fields: [direcConversationId], references: [id])
+}
+
+model DirectConversation {
+  id         String          @id @default(auto()) @map("_id") @db.ObjectId
+  user1Id    String
+  user2Id    String
+  createdAt  DateTime        @default(now())
+  messages   DirectMessage[]
+}
+
+model GroupMessage {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    content   String 
+    createdAt DateTime @default(now())
+    senderId  String   @db.ObjectId
+    groupId   String   @db.ObjectId
+    group     Group    @relation(fields: [groupId], references: [id])
+}
+
+model Group {
+    id        String         @id @default(auto()) @map("_id") @db.ObjectId
+    name      String
+    createdAt DateTime       @default(now())
+    members   Json
+    messages  GroupMessage[]
+}
